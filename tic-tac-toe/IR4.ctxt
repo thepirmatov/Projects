@@ -1,0 +1,25 @@
+#BlueJ class context
+comment0.target=IR4
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment2.params=
+comment2.target=void\ displayGoodbye()
+comment3.params=msg
+comment3.target=java.lang.String\ getString(java.lang.String)
+comment3.text=\ Gets\ a\ String\ from\ the\ keyboard.\ Rejects\ null\ entry\ or\ any\ number\ of\ spaces.\r\n\ @param\ msg\ is\ the\ text\ that\ will\ be\ displayed\ the\ user\ to\ ask\ them\ to\ enter\ a\ value.\r\n\ @return\ Returns\ a\ String\ from\ the\ keyboard.\ \r\n
+comment4.params=msg
+comment4.target=int\ getInteger(java.lang.String)
+comment4.text=\ Gets\ an\ Integer\ from\ the\ keyboard.\ Rejects\ null,\ spaces\ and\ non-integers.\r\n\ @param\ msg\ is\ the\ text\ that\ will\ be\ displayed\ the\ user\ to\ ask\ them\ to\ enter\ a\ number.\r\n\ @return\ Returns\ an\ int\ from\ the\ keyboard.\ \r\n
+comment5.params=msg
+comment5.target=double\ getDouble(java.lang.String)
+comment5.text=\ Gets\ a\ Double\ from\ the\ keyboard.\ Rejects\ null,\ spaces\ and\ non-numbers.\r\n\ @param\ msg\ is\ the\ text\ that\ will\ be\ displayed\ the\ user\ to\ ask\ them\ to\ enter\ a\ number.\r\n\ @return\ Returns\ a\ double\ from\ the\ keyboard.\ \r\n
+comment6.params=msg
+comment6.target=boolean\ getYorN(java.lang.String)
+comment6.text=\ Gets\ a\ Yes\ or\ No\ answer\ from\ the\ keyboard.\ Calls\ getString\ to\ rejects\ null\ input\ and\ spaces.\r\n\ @param\ msg\ is\ the\ text\ that\ will\ be\ displayed\ the\ user.\r\n\ @return\ Returns\ a\ boolean\ value.\ True\ \=\ yes;\ False\ \=\ no.\ \r\n
+comment7.params=
+comment7.target=void\ closeScanner()
+comment7.text=\ Closes\ the\ scanner.\r\n
+comment8.params=low\ high
+comment8.target=int\ getRandomNumber(int,\ int)
+comment8.text=\ Generates\ a\ random\ number\ between\ low\ and\ high,\ inclusive.\r\n\ @param\ low\ is\ the\ smallest\ number\ that\ will\ be\ randomly\ generated.\r\n\ @param\ high\ is\ the\ largest\ number\ that\ will\ be\ randomly\ generated.\r\n\ @return\ Returns\ the\ random\ number\ as\ an\ integer.\r\n
+numComments=9

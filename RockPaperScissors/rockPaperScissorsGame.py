@@ -7,9 +7,10 @@ mp_hands = mp.solutions.hands
 
 def getHandMove(hand_landmarks):
     landmarks = hand_landmarks.landmark
-    if all([landmarks[i].y < landmarks[i+3].y for i in range(9, 20, 4)]): return "rock"
+    if all([landmarks[i].y > landmarks[i+2].y for i in range(6,20,4)]): return "paper"
+    elif all([landmarks[i].y < landmarks[i+3].y for i in range(5, 20, 4)]): return "rock"
     elif landmarks[13].y < landmarks[16].y and landmarks[17].y < landmarks[20].y: return "scissors"
-    else: return "paper"
+    else: return "notRecognized"
 
 
 
