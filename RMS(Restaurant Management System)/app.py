@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -9,11 +9,13 @@ from werkzeug.security import check_password_hash
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '88cd7caab05340c0bcf71a4308072096'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Use SQLite for simplicity
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+csrf = CSRFProtect()
 
 # Define SQLAlchemy models
 class Restaurant(db.Model):
@@ -44,6 +46,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+csrf.init_app(app)
 
 # Flask-Login user loader
 @login_manager.user_loader
