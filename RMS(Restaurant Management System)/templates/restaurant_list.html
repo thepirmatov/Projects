@@ -1,54 +1,37 @@
-<!-- templates/restaurant_list.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant List</title>
-</head>
-<body>
+<!-- restaurant_list.html -->
+{% extends 'base.html' %}
 
+{% block title %}Restaurant List{% endblock %}
+
+{% block content %}
+    <!-- Content specific to the restaurant list page goes here -->
     {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     {% endwith %}
 
     {% if current_user.is_authenticated %}
-    <p>Welcome, {{ current_user.username }}!</p>
-    <a href="{{ url_for('logout') }}">Logout</a>
+        <p>Welcome, {{ current_user.username }}! <a href="{{ url_for('logout') }}">Logout</a></p>
     {% else %}
-    <a href="{{ url_for('login') }}">Login</a>
+        <p><a href="{{ url_for('login') }}">Login</a></p>
     {% endif %}
 
     <h2>Restaurant List</h2>
     <ul>
         {% for restaurant in restaurants %}
-        <li>
-            {{ restaurant.name }} - {{ restaurant.location }}
-            <a href="{{ url_for('edit_restaurant', restaurant_id=restaurant.id) }}">Edit</a>
-            <form method="post" action="{{ url_for('delete_restaurant', restaurant_id=restaurant.id) }}" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </li>
-    {% endfor %}
+            <li>
+                {{ restaurant.name }} - {{ restaurant.location }}
+                <a href="{{ url_for('edit_restaurant', restaurant_id=restaurant.id) }}">Edit</a>
+                <form method="post" action="{{ url_for('delete_restaurant', restaurant_id=restaurant.id) }}" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
     </ul>
     <a href="{{ url_for('add_restaurant') }}">Add a new restaurant</a>
-
-    <ul>
-        <li><a href="{{ url_for('home') }}">Home</a></li>
-        <li><a href="{{ url_for('restaurant_list') }}">Restaurants</a></li>
-        {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        {% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-        {% endif %}
-    </ul>
-</body>
-</html>
+{% endblock %}

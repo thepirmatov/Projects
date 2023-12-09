@@ -1,48 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Management</title>
-</head>
-<body>
+<!-- Extend the base.html template -->
+{% extends "base.html" %}
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
+<!-- Define the content block -->
+{% block content %}
+    <!-- Your home page content goes here -->
+    <h1>Welcome to the Home Page!</h1>
+    <p>This is the content of the home page.</p>
+
+    <!-- You can include the restaurant list here or use a separate block if needed -->
+    {% if current_user.is_authenticated %}
+        <h2>Your Restaurants</h2>
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>{{ restaurant.name }} - {{ restaurant.location }}</li>
             {% endfor %}
         </ul>
+        <a href="{{ url_for('add_restaurant') }}">Add Restaurant</a>
     {% endif %}
-    {% endwith %}
-
-    {% if current_user.is_authenticated %}
-    <p>Welcome, {{ current_user.username }}!</p>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-    <a href="{{ url_for('login') }}">Login</a>
-    {% endif %}
-
-    <h1>Restaurant List</h1>
-    <ul>
-        {% for restaurant in restaurants %}
-            <li>{{ restaurant.name }} - {{ restaurant.location }} 
-                <a href="{{ url_for('delete_restaurant', restaurant_id=restaurant.id) }}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('add_restaurant') }}">Add Restaurant</a>
-
-    <ul>
-        <li><a href="{{ url_for('home') }}">Home</a></li>
-        <li><a href="{{ url_for('restaurant_list') }}">Restaurants</a></li>
-        {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        {% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-        {% endif %}
-    </ul>
-</body>
-</html>
+{% endblock %}

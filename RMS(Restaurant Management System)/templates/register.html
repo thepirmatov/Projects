@@ -1,11 +1,10 @@
-<!-- login.html -->
+<!-- templates/register.html -->
 {% extends 'base.html' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
-    <!-- Content specific to the login page goes here -->
-    <h2>Login</h2>
+    <h2>Register</h2>
     
     <!-- Display flash messages if any -->
     {% with messages = get_flashed_messages() %}
@@ -18,8 +17,8 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Login Form -->
-    <form method="post" action="{{ url_for('login') }}">
+    <!-- Registration Form -->
+    <form method="post" action="{{ url_for('register') }}">
         {{ form.hidden_tag() }}
         
         <div>
@@ -31,9 +30,16 @@
             <label for="{{ form.password.id }}">{{ form.password.label }}</label>
             {{ form.password() }}
         </div>
+
+        <div>
+            <label for="{{ form.confirm_password.id }}">{{ form.confirm_password.label }}</label>
+            {{ form.confirm_password() }}
+        </div>
         
         {{ form.submit() }}
     </form>
 
-    <!-- Add any additional content or links as needed -->
+    <!-- Link to login page -->
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+
 {% endblock %}

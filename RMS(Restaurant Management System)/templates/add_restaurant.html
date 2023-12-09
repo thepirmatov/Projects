@@ -1,46 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Restaurant</title>
-</head>
-<body>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
+<!-- add_restaurant.html -->
+{% extends 'base.html' %}
 
-    {% if current_user.is_authenticated %}
-    <p>Welcome, {{ current_user.username }}!</p>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-    <a href="{{ url_for('login') }}">Login</a>
-    {% endif %}
+{% block title %}Add Restaurant{% endblock %}
 
+{% block content %}
     <h1>Add Restaurant</h1>
     <form method="post" action="{{ url_for('add_restaurant') }}">
         {{ form.hidden_tag() }}
         {{ form.name.label }} {{ form.name() }}
         {{ form.location.label }} {{ form.location() }}
+
+        {% if current_user.is_admin %}
+            {{ form.user_id.label }} {{ form.user_id() }}
+        {% endif %}
+
         {{ form.submit() }}
     </form>
     <a href="{{ url_for('home') }}">Back to Home</a>
-
-    <ul>
-        <li><a href="{{ url_for('home') }}">Home</a></li>
-        <li><a href="{{ url_for('restaurant_list') }}">Restaurants</a></li>
-        {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        {% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-        {% endif %}
-    </ul>
-</body>
-</html>
+{% endblock %}
