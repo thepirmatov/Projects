@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, abo
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm, CSRFProtect
-from wtforms import StringField, PasswordField, SubmitField, HiddenField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, HiddenField, SelectField, FloatField
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -23,6 +23,7 @@ class Restaurant(db.Model):
     name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    menu_items = db.relationship('Menu', backref='restaurant', lazy=True)
 
 class Menu(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -76,6 +77,19 @@ class EditRestaurantForm(FlaskForm):
     submit = SubmitField('Save Changes')
 
 class DeleteRestaurantForm(FlaskForm):
+    submit = SubmitField('Delete')
+
+class MenuForm(FlaskForm):
+    item_name = StringField('Item Name', validators=[DataRequired()])
+    price = FloatField('Price', validators=[DataRequired()])
+    submit = SubmitField('Add Item')
+
+class EditMenuForm(FlaskForm):
+    item_name = StringField('Item Name', validators=[DataRequired()])
+    price = FloatField('Price', validators=[DataRequired()])
+    submit = SubmitField('Save Changes')
+
+class DeleteMenuForm(FlaskForm):
     submit = SubmitField('Delete')
 
 csrf.init_app(app)
@@ -220,11 +234,22 @@ def restaurant_list():
     if current_user.is_admin:
         # Admin (you) can see all restaurants
         restaurants = Restaurant.query.all()
+        is_admin = True
+        delete_restaurant_form = DeleteRestaurantForm()
     else:
         # Non-admin users can only see their own added restaurants
         restaurants = Restaurant.query.filter_by(user_id=current_user.id).all()
+        is_admin = False
+        delete_restaurant_form = None
 
-    return render_template('restaurant_list.html', restaurants=restaurants)
+    return render_template('restaurant_list.html', restaurants=restaurants, is_admin=is_admin, delete_restaurant_form=delete_restaurant_form)
+
+@app.route('/restaurant_detail/<int:restaurant_id>')
+@login_required
+def restaurant_detail(restaurant_id):
+    restaurant = Restaurant.query.get(restaurant_id)
+    return render_template('restaurant_detail.html', restaurant=restaurant)
+
 
 @app.route('/delete_restaurant/<int:restaurant_id>', methods=['POST'])
 @login_required
@@ -267,6 +292,86 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
+@app.route('/add_menu/<int:restaurant_id>', methods=['GET', 'POST'])
+@login_required
+def add_menu(restaurant_id):
+    restaurant = Restaurant.query.get(restaurant_id)
+
+    # Check if the current user has permission to add menu items for this restaurant
+    if not current_user.is_admin and current_user.id != restaurant.user_id:
+        flash('You do not have permission to add menu items for this restaurant.', 'error')
+        return redirect(url_for('restaurant_list'))
+
+    form = MenuForm()
+
+    if form.validate_on_submit():
+        item_name = form.item_name.data
+        price = form.price.data
+
+        new_menu_item = Menu(item_name=item_name, price=price, restaurant_id=restaurant_id)
+        db.session.add(new_menu_item)
+        db.session.commit()
+
+        flash('Menu item added successfully!', 'success')
+        return redirect(url_for('restaurant_list'))
+
+    return render_template('add_menu.html', form=form, restaurant=restaurant)
+
+
+@app.route('/edit_menu/<int:menu_id>', methods=['GET', 'POST'])
+@login_required
+def edit_menu(menu_id):
+    menu_item = Menu.query.get(menu_id)
+    restaurant = Restaurant.query.get(menu_item.restaurant_id)
+
+    # Check if the current user has permission to edit this menu item
+    if not current_user.is_admin and current_user.id != restaurant.user_id:
+        flash('You do not have permission to edit this menu item.', 'error')
+        return redirect(url_for('restaurant_list'))
+
+    form = EditMenuForm(obj=menu_item)
+
+    if form.validate_on_submit():
+        menu_item.item_name = form.item_name.data
+        menu_item.price = form.price.data
+
+        db.session.commit()
+
+        flash('Menu item updated successfully!', 'success')
+        return redirect(url_for('restaurant_list'))
+
+    return render_template('edit_menu.html', form=form, menu_item=menu_item, restaurant=restaurant)
+
+@app.route('/delete_menu/<int:menu_id>', methods=['POST'])
+@login_required
+def delete_menu(menu_id):
+    menu_item = Menu.query.get(menu_id)
+    restaurant = Restaurant.query.get(menu_item.restaurant_id)
+
+    # Check if the current user has permission to delete this menu item
+    if not current_user.is_admin and current_user.id != restaurant.user_id:
+        flash('You do not have permission to delete this menu item.', 'error')
+        return redirect(url_for('restaurant_list'))
+
+    db.session.delete(menu_item)
+    db.session.commit()
+
+    flash('Menu item deleted successfully!', 'success')
+    return redirect(url_for('restaurant_list'))
+
+@app.route('/menu_list/<int:restaurant_id>')
+@login_required
+def menu_list(restaurant_id):
+    # Retrieve menu items for the specified restaurant_id
+    menu_items = Menu.query.filter_by(restaurant_id=restaurant_id).all()
+    # Implement your logic here
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    delete_menu_form = DeleteMenuForm()  # Assuming you have a form named DeleteMenuForm
+
+    return render_template('menu_list.html', restaurant=restaurant, menu_items=menu_items, delete_menu_form=delete_menu_form)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

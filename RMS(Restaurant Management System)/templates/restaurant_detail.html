@@ -1,0 +1,27 @@
+<!-- restaurant_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ restaurant.name }} - {{ restaurant.location }}{% endblock %}
+
+{% block content %}
+    <div>
+        <h2>{{ restaurant.name }}</h2>
+        <p>Location: {{ restaurant.location }}</p>
+        <!-- Add any additional restaurant details you want to display -->
+
+        <a href="{{ url_for('menu_list', restaurant_id=restaurant.id) }}">View Menu</a>
+    </div>
+
+    <!-- Additional content specific to the restaurant goes here -->
+
+    <ul>
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('restaurant_list') }}">Restaurants</a></li>
+        {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}

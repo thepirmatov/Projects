@@ -7,14 +7,31 @@
     <h1>Welcome to the Home Page!</h1>
     <p>This is the content of the home page.</p>
 
-    <!-- You can include the restaurant list here or use a separate block if needed -->
     {% if current_user.is_authenticated %}
-        <h2>Your Restaurants</h2>
-        <ul>
-            {% for restaurant in restaurants %}
-                <li>{{ restaurant.name }} - {{ restaurant.location }}</li>
-            {% endfor %}
-        </ul>
+        {% if current_user.is_admin %}
+            <!-- Display all restaurants for admin -->
+            <h2>All Restaurants</h2>
+            <ul>
+                {% for restaurant in restaurants %}
+                    <li>{{ restaurant.owner.username }}
+                        <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                        - {{ restaurant.name }} - {{ restaurant.location }}
+                    </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <!-- Display user's own restaurants -->
+            <h2>Your Restaurants</h2>
+            <ul>
+                {% for restaurant in current_user.restaurants %}
+                    <li><a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                        {{ restaurant.name }} - {{ restaurant.location }}
+                    </a></li>
+                {% endfor %}
+            </ul>
+            
+        {% endif %}
         <a href="{{ url_for('add_restaurant') }}">Add Restaurant</a>
     {% endif %}
 {% endblock %}

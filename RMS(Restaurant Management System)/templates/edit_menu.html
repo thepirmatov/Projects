@@ -1,0 +1,29 @@
+<!-- edit_menu.html -->
+{% extends 'base.html' %}
+
+{% block title %}Edit Menu Item{% endblock %}
+
+{% block content %}
+    <h2>Edit Menu Item</h2>
+    <form method="post" action="{{ url_for('edit_menu', menu_id=menu_item.id) }}">
+        {{ form.hidden_tag() }}
+        <label for="item_name">Item Name:</label>
+        <input type="text" id="item_name" name="item_name" value="{{ form.item_name.data }}" required>
+        <br>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" value="{{ form.price.data }}" required>
+        <br>
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <ul>
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('restaurant_list') }}">Restaurants</a></li>
+        {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
