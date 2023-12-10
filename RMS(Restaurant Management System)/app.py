@@ -14,10 +14,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['TESTING'] = True
 app.config['SQLALCHEMY_DATABASE_URI_TESTING'] = 'sqlite:///test_site.db'  # Separate database for testing
 
-if not app.config['TESTING']:
-    db = SQLAlchemy(app)
-    migrate = Migrate(app, db)
-    csrf = CSRFProtect(app)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -62,8 +61,6 @@ class RestaurantForm(FlaskForm):
     user_id = SelectField('User', coerce=int)
     submit = SubmitField('Add Restaurant')
 
-
-
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -72,7 +69,10 @@ class LoginForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=50)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=100)])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('password', message='Passwords must match.')
+    ])
     submit = SubmitField('Register')
 
     def validate_username(self, field):
@@ -157,7 +157,7 @@ def promote_user(username):
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 @app.route('/admin_dashboard')
 @login_required
