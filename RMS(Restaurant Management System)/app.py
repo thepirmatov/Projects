@@ -11,13 +11,37 @@ from functools import wraps
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '88cd7caab05340c0bcf71a4308072096'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+app.config['TESTING'] = True
+app.config['SQLALCHEMY_DATABASE_URI_TESTING'] = 'sqlite:///test_site.db'  # Separate database for testing
+
+if not app.config['TESTING']:
+    db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
+    csrf = CSRFProtect(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-csrf = CSRFProtect(app)
 
 # Define SQLAlchemy models
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), nullable=False, default='user')
+    # One-to-many relationship with Restaurant
+    restaurants = db.relationship('Restaurant', backref='owner', lazy=True)
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def __repr__(self):
+        return f"User('{self.username}')"
+
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -38,23 +62,7 @@ class RestaurantForm(FlaskForm):
     user_id = SelectField('User', coerce=int)
     submit = SubmitField('Add Restaurant')
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
-    role = db.Column(db.String(20), nullable=False, default='user')
-    # One-to-many relationship with Restaurant
-    restaurants = db.relationship('Restaurant', backref='owner', lazy=True)
 
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-    def __repr__(self):
-        return f"User('{self.username}')"
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
