@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload and Transcript</title>
+  <style>
+    /* Basic styling for the page */
+  </style>
+</head>
+<body>
+  <h1>Upload a File for Transcription</h1>
+  <form id="upload-form" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" id="file-input">
+    <button type="submit">Upload</button>
+  </form>
+  <div id="message"></div>
+  <script>
+    const form = document.getElementById('upload-form');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      const fileInput = document.getElementById('file-input');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        message.innerText = "Please select a file to upload.";
+        return;
+      }
+
+      // Send the file data to the backend using FormData
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          message.innerText = data.error;
+        } else {
+          message.innerText = data.message;
+          // Handle successful transcript download (logic depends on your frontend framework)
+          // You can display the transcript content or trigger a download here.
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        message.innerText = "An error occurred during upload.";
+      });
+    });
+  </script>
+</body>
+</html>
