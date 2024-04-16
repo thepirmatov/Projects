@@ -6,6 +6,7 @@
  * @version 10/03/2020
  */
 import java.util.Scanner;
+
 public class Main
 {
     static Scanner keyboard = new Scanner(System.in);
